@@ -177,59 +177,71 @@ Maze.prototype.parseMaze = function(nodes) {
 	return nodes;
 }
 
-
 Maze.prototype.getMatrix = function(nodes) {
-	const mazeSize = this.width * this.height;
+    const mazeSize = this.width * this.height;
+    const centerX = this.width / 2;
+    const centerY = this.height / 2;
+    const radiusSquared = Math.pow(this.radius, 2);
 
-	// Add the complete maze in a matrix
-	// where 1 is a wall and 0 is a corridor.
+    let row1 = '';
+    let row2 = '';
 
-	let row1 = '';
-	let row2 = '';
+    for (let i = 0; i < mazeSize; i++) {
+        let x = i % this.width;
+        let y = Math.floor(i / this.width);
+        const isInRadius = Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) <= radiusSquared;
 
-	if (nodes.length !== mazeSize) {
-		return;
-	}
+        if (nodes.length !== mazeSize || !isInRadius) {
+            continue; // Skip initializing walls for out-of-radius cells
+        }
 
-	for (let i = 0; i < mazeSize; i++) {
-		row1 += !row1.length ? '1' : '';
-		row2 += !row2.length ? '1' : '';
+        row1 += !row1.length ? '1' : '';
+        row2 += !row2.length ? '1' : '';
 
-		if (stringVal(nodes[i], 1)) {
-			row1 += '11';
-			if (stringVal(nodes[i], 4)) {
-				row2 += '01';
-			} else {
-				row2 += '00';
-			}
-		} else {
-			let hasAbove = nodes.hasOwnProperty(i - this.width);
-			let above = hasAbove && stringVal(nodes[i - this.width], 4);
-			let hasNext = nodes.hasOwnProperty(i + 1);
-			let next = hasNext && stringVal(nodes[i + 1], 1);
+        if (stringVal(nodes[i], 1) && isInRadius) {
+            row1 += '11';
+            if (stringVal(nodes[i], 4) && isInRadius) {
+                row2 += '01';
+            } else {
+                row2 += '00';
+            }
+        } else {
+            let hasAbove = nodes.hasOwnProperty(i - this.width);
+            let above = hasAbove && stringVal(nodes[i - this.width], 4);
+            let hasNext = nodes.hasOwnProperty(i + 1);
+            let next = hasNext && stringVal(nodes[i + 1], 1);
 
-			if (stringVal(nodes[i], 4)) {
-				row1 += '01';
-				row2 += '01';
-			} else if (next || above) {
-				row1 += '01';
-				row2 += '00';
-			} else {
-				row1 += '00';
-				row2 += '00';
-			}
-		}
+            if (stringVal(nodes[i], 4) && isInRadius) {
+                row1 += '01';
+                row2 += '01';
+            } else if ((next || above) && isInRadius) {
+                row1 += '01';
+                row2 += '00';
+            } else {
+                row1 += '00';
+                row2 += '00';
+            }
+        }
 
-		if (0 === ((i + 1) % this.width)) {
-			this.matrix.push(row1);
-			this.matrix.push(row2);
-			row1 = '';
-			row2 = '';
-		}
-	}
+        if (0 === ((i + 1) % this.width)) {
+            this.matrix.push(row1);
+            this.matrix.push(row2);
+            row1 = '';
+            row2 = '';
+        }
+    }
 
-	// Add closing row
-	this.matrix.push('1'.repeat((this.width * 2) + 1));
+    // Add closing row
+    let lastRow = '1'.repeat((this.width * 2) + 1);
+    for (let i = 0; i <= this.width; i++) {
+        let x = i;
+        let y = this.height;
+        if (Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) > radiusSquared) {
+            // Overwrite with '0' where the position falls outside the radius
+            lastRow = replaceAt(lastRow, i * 2, '00');
+        }
+    }
+    this.matrix.push(lastRow);
 }
 
 Maze.prototype.getEntryNodes = function(access, radius) {
@@ -242,11 +254,11 @@ Maze.prototype.getEntryNodes = function(access, radius) {
 		entryNodes.start = { 'x': 1, 'y': 1, 'gate': { 'x': 0, 'y': 1 } };
 		entryNodes.end = { 'x': x, 'y': y, 'gate': { 'x': x + 1, 'y': y } };
 	} else if ('diagonal' === access) {
-		const startY = (this.height) - radius;
-		const startX = (this.width) - radius; 
+		const startY = this.height - radius;
+		const startX = this.width - radius; 
 		entryNodes.start = { 'x': startX, 'y': startY, 'gate': { 'x': startX - 1, 'y': startY } };
-		const endY = (this.height) + radius - 1;
-		const endX = (this.width) + radius - 1; 
+		const endY = this.height + radius - 1;
+		const endX = this.width + radius - 1; 
 		entryNodes.end = { 'x': endX, 'y': endY, 'gate': { 'x': endX + 1, 'y': endY } };
 		alert([startY, startX, endY, endX])
 	}
