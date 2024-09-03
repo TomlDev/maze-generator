@@ -30,7 +30,7 @@ function Maze(args) {
 	this.height = parseInt(settings['height'], 10);
 	this.wallSize = parseInt(settings['wallSize'], 10);
 	this.removeWalls = parseInt(settings['removeWalls'], 10);
-	this.entryNodes = this.getEntryNodes(settings['entryType']);
+	this.entryNodes = this.getEntryNodes(settings['entryType'], settings['radius']);
 	this.bias = settings['bias'];
 	this.color = settings['color'];
 	this.backgroundColor = settings['backgroundColor'];
@@ -85,7 +85,6 @@ Maze.prototype.generateNodes = function() {
         let y = Math.floor(i / this.width);
         // Calculate if the node is within the circular boundary
 		const isInRadius = Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) <= radiusSquared; 
-        alert([centerX, centerY, this.radius, radiusSquared, x, y, isInRadius]);
 		if (this.radius === 0 || isInRadius) {
             nodes[i] = "01111"; // Node within the circle
         } else {
@@ -93,7 +92,8 @@ Maze.prototype.generateNodes = function() {
         }
     }
 
-    return nodes;
+	// alert([centerX, centerY, this.radius, radiusSquared, x, y, isInRadius]);
+	return nodes;
 };
 
 // ||
@@ -232,15 +232,23 @@ Maze.prototype.getMatrix = function(nodes) {
 	this.matrix.push('1'.repeat((this.width * 2) + 1));
 }
 
-Maze.prototype.getEntryNodes = function(access) {
-	const y = ((this.height * 2) + 1) - 2;
-	const x = ((this.width * 2) + 1) - 2;
+Maze.prototype.getEntryNodes = function(access, radius) {
+	const y = (this.height * 2) - 1;
+	const x = (this.width * 2) - 1;
 
 	let entryNodes = {};
 
-	if ('diagonal' === access) {
+	if ('diagonal' === access && radius === 0) {
 		entryNodes.start = { 'x': 1, 'y': 1, 'gate': { 'x': 0, 'y': 1 } };
 		entryNodes.end = { 'x': x, 'y': y, 'gate': { 'x': x + 1, 'y': y } };
+	} else if ('diagonal' === access) {
+		const startY = (this.height / 2) - radius;
+		const startX = (this.width / 2) - radius; 
+		entryNodes.start = { 'x': startX, 'y': startY, 'gate': { 'x': startX - 1, 'y': startY } };
+		const endY = (this.height / 2) + radius - 1;
+		const endX = (this.width / 2) + radius - 1; 
+		entryNodes.end = { 'x': endX, 'y': endY, 'gate': { 'x': endX + 1, 'y': endY } };
+		alert([startX, startY, endX, endY])
 	}
 
 	if ('horizontal' === access || 'vertical' === access) {
