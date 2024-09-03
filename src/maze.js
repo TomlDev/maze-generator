@@ -248,7 +248,7 @@ Maze.prototype.getEntryNodes = function(access, radius) {
 		const endY = (this.height) + radius - 1;
 		const endX = (this.width) + radius - 1; 
 		entryNodes.end = { 'x': endX, 'y': endY, 'gate': { 'x': endX + 1, 'y': endY } };
-		alert(entryNodes.toString())
+		alert([startY, startX, endY, endX])
 	}
 
 	if ('horizontal' === access || 'vertical' === access) {
