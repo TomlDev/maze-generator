@@ -1,5 +1,6 @@
 function Maze(args) {
 	const defaults = {
+		radius: 0,
 		width: 20,
 		height: 20,
 		wallSize: 10,
@@ -24,6 +25,7 @@ function Maze(args) {
 
 	this.matrix = [];
 	this.wallsRemoved = 0;
+	this.radius = parseInt(settings['radius'], 10);
 	this.width = parseInt(settings['width'], 10);
 	this.height = parseInt(settings['height'], 10);
 	this.wallSize = parseInt(settings['wallSize'], 10);
@@ -72,16 +74,28 @@ Maze.prototype.isValidSize = function() {
 }
 
 Maze.prototype.generateNodes = function() {
-	const count = this.width * this.height;
-	let nodes = [];
+    const count = this.width * this.height;
+    let nodes = [];
+    const centerX = this.width / 2;
+    const centerY = this.height / 2;
+    const radiusSquared = Math.pow(this.radius, 2);
 
-	for (let i = 0; i < count; i++) {
-		// visited, nswe
-		nodes[i] = "01111";
-	}
+    for (let i = 0; i < count; i++) {
+        let x = i % this.width;
+        let y = Math.floor(i / this.width);
+        // Calculate if the node is within the circular boundary
+		const isInRadius = Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) <= radiusSquared; 
+        if (this.radius === 0 || isInRadius) {
+            nodes[i] = "01111"; // Node within the circle
+        } else {
+            nodes[i] = "00000"; // Node outside the circle
+        }
+    }
 
-	return nodes;
-}
+    return nodes;
+};
+
+// ||
 
 Maze.prototype.parseMaze = function(nodes) {
 

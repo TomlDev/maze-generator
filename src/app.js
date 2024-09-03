@@ -45,6 +45,7 @@ function initMaze() {
         width: getInputIntVal('width', 20),
         height: getInputIntVal('height', 20),
         wallSize: getInputIntVal('wall-size', 10),
+        radius: getInputIntVal('radius', 10),
         removeWalls: getInputIntVal('remove_walls', 0),
         entryType: '',
         bias: '',
