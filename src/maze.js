@@ -242,13 +242,13 @@ Maze.prototype.getEntryNodes = function(access, radius) {
 		entryNodes.start = { 'x': 1, 'y': 1, 'gate': { 'x': 0, 'y': 1 } };
 		entryNodes.end = { 'x': x, 'y': y, 'gate': { 'x': x + 1, 'y': y } };
 	} else if ('diagonal' === access) {
-		const startY = (this.height / 2) - radius;
-		const startX = (this.width / 2) - radius; 
+		const startY = (this.height) - radius;
+		const startX = (this.width) - radius; 
 		entryNodes.start = { 'x': startX, 'y': startY, 'gate': { 'x': startX - 1, 'y': startY } };
-		const endY = (this.height / 2) + radius - 1;
-		const endX = (this.width / 2) + radius - 1; 
+		const endY = (this.height) + radius - 1;
+		const endX = (this.width) + radius - 1; 
 		entryNodes.end = { 'x': endX, 'y': endY, 'gate': { 'x': endX + 1, 'y': endY } };
-		alert([startX, startY, endX, endY])
+		alert(entryNodes.toString())
 	}
 
 	if ('horizontal' === access || 'vertical' === access) {
