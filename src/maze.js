@@ -85,7 +85,8 @@ Maze.prototype.generateNodes = function() {
         let y = Math.floor(i / this.width);
         // Calculate if the node is within the circular boundary
 		const isInRadius = Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) <= radiusSquared; 
-        if (this.radius === 0 || isInRadius) {
+        alert([centerX, centerY, this.radius, radiusSquared, x, y, isInRadius]);
+		if (this.radius === 0 || isInRadius) {
             nodes[i] = "01111"; // Node within the circle
         } else {
             nodes[i] = "00000"; // Node outside the circle
